@@ -27,9 +27,10 @@ print('[Training] training start:')
 for epoch in tqdm(range(1, param.training.n_epochs + 1), desc='Training epoch'):
     start_time = time.time()
 
+    tqdm_obj = tqdm(total=len(trainer.datal_loader_train), desc='Inner epoch {}'.format(epoch))
     for idx, (image, volume, vector, base_path, object_id, view_index, class_name) in enumerate(trainer.datal_loader_train):
 
-        print("[iter {} name: {} mode: {} IF: {}]".format(trainer.logger.iteration, param.name, param.mode, param.renderer.type))
+        # print("[iter {} name: {} mode: {} IF: {}]".format(trainer.logger.iteration, param.name, param.mode, param.renderer.type))
 
         image = image.to(param.device)
         volume = volume.to(param.device)
@@ -47,5 +48,6 @@ for epoch in tqdm(range(1, param.training.n_epochs + 1), desc='Training epoch'):
             trainer.logger.log_gradients(model)
 
         trainer.logger.step()
+        tqdm_obj.update(1)
 
 print('Training finished!...')
