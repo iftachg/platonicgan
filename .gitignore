@@ -127,3 +127,16 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# Prkect
+output/
+server/
+datasets/*
+
+# Python
+*.pyc
+.ipynb_checkpoints/
+
+# PyCharm
+.idea
