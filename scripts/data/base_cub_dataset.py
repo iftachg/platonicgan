@@ -32,7 +32,7 @@ class BaseCUBDataset(ImageDataset):
 
     def create_splits(self):
         '''
-        Create train-val-test splits if non exist for given parameters
+        Dynamically create train-val-test splits if non exist for given combination of dataset
         '''
         os.makedirs(self.list_path, exist_ok=True)
 
