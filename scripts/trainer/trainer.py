@@ -81,7 +81,7 @@ class Trainer(object):
             discriminator_3d = discriminator_type(self.param)
             discriminator_3d = discriminator_3d.to(self.param.device)
 
-        if self.param.mode == 'platonic' or self.param.mode == 'platonic_3D':
+        if self.param.mode == 'platonic' or self.param.mode == 'platonic_3D' or self.param.mode == 'holistic':
             discriminator_type = discriminator_dict[self.param.models.discriminator.name]
             discriminator_2d = discriminator_type(self.param)
             discriminator_2d = discriminator_2d.to(self.param.device)
@@ -138,7 +138,7 @@ class Trainer(object):
             else:
                 raise NotImplementedError
 
-        if self.param.mode == 'platonic' or self.param.mode == 'platonic_3D':
+        if self.param.mode == 'platonic' or self.param.mode == 'platonic_3D' or self.param.mode == 'holistic':
 
             d_params_2d = filter(lambda p: p.requires_grad, self.models[2].parameters())
             if optimizer_d == 'rmsprop':

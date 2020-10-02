@@ -4,7 +4,7 @@ import os
 import numpy as np
 import scripts.utils.utils as utils
 import glob
-from scripts.trainer import TrainerPlatonic, Trainer3D
+from scripts.trainer import TrainerPlatonic, Trainer3D, TrainerHolisticPlatonic
 import matplotlib.pyplot as plt
 from torchvision.utils import make_grid
 from PIL import Image
@@ -14,13 +14,15 @@ num_views = 5
 
 results_path_base = '/media/john/D/projects/platonicgan/output/CUB_manual_base'
 experiment_names = [
-                        '1_**_manual_class-downy_woodpecker_**_platonic_reconstruction_192.Downy_Woodpecker_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentFalse_28:09-16:38',
-                        '1_**_manual_class-downy_woodpecker_**_platonic_reconstruction_192.Downy_Woodpecker_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentTrue_28:09-17:02',
-                        '1_**_manual_species-tern_**_platonic_reconstruction_tern_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentFalse_25:09-16:19',
-                        '1_**_manual_wings_**_platonic_reconstruction_wings_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentFalse_28:09-19:13',
-                        '1_**_manual_wings_**_platonic_reconstruction_wings_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentTrue_28:09-22:54',
+    '1_**_manual_class-downy_woodpecker_**_holistic_reconstruction_192.Downy_Woodpecker_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentFalse_02:10-12:47',
+                        # '1_**_manual_class-downy_woodpecker_**_platonic_reconstruction_192.Downy_Woodpecker_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentFalse_28:09-16:38',
+                        # '1_**_manual_class-downy_woodpecker_**_platonic_reconstruction_192.Downy_Woodpecker_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentTrue_28:09-17:02',
+                        # '1_**_manual_species-tern_**_platonic_reconstruction_tern_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentFalse_25:09-16:19',
+                        # '1_**_manual_wings_**_platonic_reconstruction_wings_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentFalse_28:09-19:13',
+                        # '1_**_manual_wings_**_platonic_reconstruction_wings_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentTrue_28:09-22:54',
                     ]
 epochs = ['500', '1000', 'latest']
+epochs = ['latest']
 
 
 def get_random_views(trainer, output_volume, x_input, reconstructions):
@@ -224,6 +226,8 @@ for experiment_ind, experiment_name in enumerate(experiment_names):
                 trainer = TrainerPlatonic3D(param, None, True)
             elif param.mode == '3D':
                 trainer = Trainer3D(param, None, True)
+            elif param.mode == 'holistic':
+                trainer = TrainerHolisticPlatonic(param, None, True)
             else:
                 raise NotImplementedError
 

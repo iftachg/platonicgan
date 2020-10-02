@@ -1,7 +1,7 @@
 import os
 import matplotlib
 import time, torch
-from scripts.trainer import TrainerPlatonic, Trainer3D, TrainerPlatonic3D
+from scripts.trainer import TrainerPlatonic, Trainer3D, TrainerPlatonic3D, TrainerHolisticPlatonic
 from scripts.tests.tests import run_tests
 from scripts.utils.config import load_config, make_dirs
 import scripts.utils.utils as utils
@@ -18,6 +18,8 @@ elif param.mode == 'platonic_3D':
     trainer = TrainerPlatonic3D(param, dirs)
 elif param.mode == '3D':
     trainer = Trainer3D(param, dirs)
+elif param.mode == 'holistic':
+    trainer = TrainerHolisticPlatonic(param, dirs)
 
 if param.tests.activate:
     run_tests(trainer)
