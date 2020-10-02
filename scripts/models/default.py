@@ -1,7 +1,10 @@
+from abc import ABC
+
 import torch
 from torch import nn
 from torch.nn import functional as F
 from scripts.models.modules import ResnetBasicBlock
+
 
 
 class Generator(nn.Module):
@@ -23,6 +26,39 @@ class Generator(nn.Module):
         self.conv4 = nn.ConvTranspose3d(self.n_features_min * 2, self.n_features_min * 1, 4, 2, 1, bias=False)
         self.bn4 = nn.BatchNorm3d(self.n_features_min * 1)
         self.conv5 = nn.ConvTranspose3d(self.n_features_min * 1, self.n_channel, 4, 2, 1, bias=False)
+
+    def forward(self, input):
+        x = input.view(input.size(0), self.z_size, 1, 1, 1)
+        x = F.relu(self.bn1(self.conv1(x)))
+        x = F.relu(self.bn2(self.conv2(x)))
+        x = F.relu(self.bn3(self.conv3(x)))
+        x = F.relu(self.bn4(self.conv4(x)))
+        x = self.conv5(x)
+        x = torch.sigmoid(x)
+
+        return x
+
+
+class Generator2D(nn.Module, ABC):
+
+    def __init__(self, param):
+        super(Generator2D, self).__init__()
+        self.z_size = param.training.z_size
+
+        self.n_features_min = param.models.generator.n_features_min
+        self.n_channel = param.data.n_channel_out_3d
+        self.batch_size = param.training.batch_size
+        self.cube_len = param.data.cube_len
+
+        self.conv1 = nn.ConvTranspose2d(self.z_size, self.n_features_min * 8, 4, 1, 0, bias=False)
+        self.bn1 = nn.BatchNorm2d(self.n_features_min * 8)
+        self.conv2 = nn.ConvTranspose2d(self.n_features_min * 8, self.n_features_min * 4, 4, 2, 1, bias=False)
+        self.bn2 = nn.BatchNorm2d(self.n_features_min * 4)
+        self.conv3 = nn.ConvTranspose2d(self.n_features_min * 4, self.n_features_min * 2, 4, 2, 1, bias=False)
+        self.bn3 = nn.BatchNorm2d(self.n_features_min * 2)
+        self.conv4 = nn.ConvTranspose2d(self.n_features_min * 2, self.n_features_min * 1, 4, 2, 1, bias=False)
+        self.bn4 = nn.BatchNorm2d(self.n_features_min * 1)
+        self.conv5 = nn.ConvTranspose2d(self.n_features_min * 1, self.n_channel, 4, 2, 1, bias=False)
 
     def forward(self, input):
         x = input.view(input.size(0), self.z_size, 1, 1, 1)

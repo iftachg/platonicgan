@@ -1,4 +1,6 @@
-# Goal of this script is to split the test set into validation and test sets
+'''
+Goal of this script is to split the test set into validation and test sets
+'''
 from sklearn.model_selection import train_test_split
 import os
 

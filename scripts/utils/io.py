@@ -7,6 +7,8 @@ import torch
 import math
 from scipy import ndimage
 import os
+import random
+from PIL import Image
 
 
 # expected volume shape: w x h x d x c
@@ -32,10 +34,82 @@ def volume_to_raw(volume, path, name, save_info=True):
     f.close()
 
 
-def read_image(image_path, resolution=None):
+def horizontal_flip(img):
+    return cv2.flip(img, 1)
+
+
+def vertical_flip(img):
+    return cv2.flip(img, 0)
+
+
+def rotation(img, angle):
+    angle = int(random.uniform(-angle, angle))
+    h, w = img.shape[:2]
+    M = cv2.getRotationMatrix2D((int(w/2), int(h/2)), angle, 1)
+    img = cv2.warpAffine(img, M, (w, h))
+    return img
+
+
+def rotate_bound(image, angle):
+    '''
+    Rotates without cutting the image
+    '''
+    # grab the dimensions of the image and then determine the
+    # center
+    (h, w) = image.shape[:2]
+    (cX, cY) = (w // 2, h // 2)
+    # grab the rotation matrix (applying the negative of the
+    # angle to rotate clockwise), then grab the sine and cosine
+    # (i.e., the rotation components of the matrix)
+    M = cv2.getRotationMatrix2D((cX, cY), -angle, 1.0)
+    cos = np.abs(M[0, 0])
+    sin = np.abs(M[0, 1])
+    # compute the new bounding dimensions of the image
+    nW = int((h * sin) + (w * cos))
+    nH = int((h * cos) + (w * sin))
+    # adjust the rotation matrix to take into account translation
+    M[0, 2] += (nW / 2) - cX - 1
+    M[1, 2] += (nH / 2) - cY - 1
+    # perform the actual rotation and return the image
+    return cv2.warpAffine(image, M, (nW, nH))
+
+
+def remove_rotation_noise(image):
+        nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(image, connectivity=4)
+        sizes = stats[:, -1]
+
+        max_label = 1
+        max_size = sizes[1]
+        for i in range(2, nb_components):
+            if sizes[i] > max_size:
+                max_label = i
+                max_size = sizes[i]
+
+        mask = np.zeros(output.shape)
+        mask[output == max_label] = 1
+        return mask
+
+
+def apply_augmentations(image):
+    if random.randint(0, 1):
+        image = vertical_flip(image)
+    if random.randint(0, 1):
+        image = horizontal_flip(image)
+    if random.randint(0, 1):
+        image = rotate_bound(image, 20)
+        rotation_mask = remove_rotation_noise(image[:, :, 3])
+        image[:, :, 3] *= rotation_mask.astype(np.uint8)
+    return image
+
+
+def read_image(image_path, resolution=None, augmentations=False):
     # load image
 
     image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
+
+    if augmentations:
+        image = apply_augmentations(image)
+
     image = utils.normalize(image)
 
     if image.ndim == 3:

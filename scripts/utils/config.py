@@ -6,6 +6,7 @@ import yaml
 from attrdict import AttrDict
 import torch.nn as nn
 from torchvision import datasets, transforms
+from datetime import datetime
 
 
 def make_dirs(param, root=None):
@@ -18,9 +19,13 @@ def make_dirs(param, root=None):
     else:
         dirs.root = root
 
-    run_name = '{}_{}_{}_{}_{}_{}_g2d{}_g3d{}_rec2d{}_rec3d{}_n_views{}_lr_g{}_lr_d{}_bs{}_{}'.format(
+    now = datetime.now()
+
+    # run_name = '{}_{}_{}_{}_{}_{}_g2d{}_g3d{}_rec2d{}_rec3d{}_n_views{}_lr_g{}_lr_d{}_bs{}_{}'.format(
+    run_name = '{}_**_{}_**_{}_{}_{}_{}_g2d{}_g3d{}_rec2d{}_rec3d{}_n_views{}_lr_g{}_lr_d{}_bs{}_{}_augment{}_{}'.format(
         param.job_id,
-        param.name,
+        param.experiment_name,
+        # param.name,
         param.mode,
         param.task,
         '_'.join(str(e) for e in param.data.use_classes),
@@ -34,9 +39,11 @@ def make_dirs(param, root=None):
         param.training.lr_d,
         param.training.batch_size,
         param.training.view_sampling,
+        param.data.augment,
+        now.strftime("%d:%m-%H:%M")
     )
 
-    dirs.output = '{}/output/{}'.format(dirs.root, run_name)
+    dirs.output = '{}/output/{}/{}'.format(dirs.root, param.name, run_name)
 
     print('[INFO] log dir = {}'.format(run_name))
 
@@ -91,6 +98,9 @@ def load_config(config_path='scripts/configs/default_config.yaml'):
 
     if param.device == 'cuda' and not torch.cuda.is_available():
         raise Exception('No GPU found, please use "cpu" as device')
+
+    if not hasattr(param.data, 'augment'):
+        param.data.augment = False
 
     print('[INFO] Use {} {} device ({} devices are available)'.format(param.device, torch.cuda.current_device(), torch.cuda.device_count()))
     print('[INFO] Use pytorch {}'.format(torch.__version__))

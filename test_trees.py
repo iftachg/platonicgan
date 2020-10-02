@@ -11,15 +11,14 @@ from PIL import Image
 from tqdm import tqdm
 
 num_views = 5
-
 results_path_base = '/media/john/D/projects/platonicgan/output/CUB_manual_base'
 experiment_names = [
-                        '1_**_manual_class-downy_woodpecker_**_platonic_reconstruction_192.Downy_Woodpecker_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentFalse_28:09-16:38',
-                        '1_**_manual_class-downy_woodpecker_**_platonic_reconstruction_192.Downy_Woodpecker_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentTrue_28:09-17:02',
-                        '1_**_manual_species-tern_**_platonic_reconstruction_tern_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentFalse_25:09-16:19',
-                        '1_**_manual_wings_**_platonic_reconstruction_wings_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentFalse_28:09-19:13',
-                        '1_**_manual_wings_**_platonic_reconstruction_wings_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentTrue_28:09-22:54',
-                    ]
+                    '1_**_manual_class-downy_woodpecker_**_platonic_reconstruction_192.Downy_Woodpecker_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentFalse_28:09-16:38',
+                    '1_**_manual_class-downy_woodpecker_**_platonic_reconstruction_192.Downy_Woodpecker_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentTrue_28:09-17:02',
+                    '1_**_manual_species-tern_**_platonic_reconstruction_tern_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentFalse_25:09-16:19',
+                    '1_**_manual_wings_**_platonic_reconstruction_wings_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentFalse_28:09-19:13',
+                    '1_**_manual_wings_**_platonic_reconstruction_wings_absorption_only_g2d1.0_g3d0.0_rec2d8.0_rec3d0.0_n_views2_lr_g0.0025_lr_d1e-05_bs4_random_augmentTrue_28:09-22:54',
+                ]
 epochs = ['500', '1000', 'latest']
 
 
@@ -138,6 +137,7 @@ def save_views(views_dir, idx, views_tensor, volumes, postfix):
 
         save_grid(idx, postfix, batch_ind, sample_results, views_dir)
         save_list(idx, postfix, batch_ind, sample_results, sample_volume, views_dir)
+        break
 
 
 def save_grid(idx, postfix, sample_id, sample_results, views_dir):
@@ -179,7 +179,6 @@ def save_list(idx, postfix, sample_id, sample_results, sample_volume, views_dir)
 
 
 def save_volume_view(volume, path, elev=0, azim=0):
-
     threshed_volume = volume.gt(0.5).int()
 
     fig = plt.figure()
@@ -245,9 +244,6 @@ for experiment_ind, experiment_name in enumerate(experiment_names):
                 for idx, (image, volume, vector, base_path, object_id, view_index, class_name) in enumerate(
                         trainer.data_loader_test):
 
-                    # print('{}/{}: {}/{}'.format(idx_configs + 1, len(training_configs), n_outputs_counter + 1,
-                    #                             int(trainer.dataset_test.__len__() / param.training.batch_size)))
-
                     x_input = image.to(param.device)
                     volume = volume.to(param.device)
                     vector = vector.to(param.device)
@@ -265,12 +261,18 @@ for experiment_ind, experiment_name in enumerate(experiment_names):
                     sampled_views_tensor, sampled_volumes = get_sampled_views(trainer, output_volume, x_input, reconstructions)
                     maxed_views_tensor, maxed_volumes = get_maxed_views(trainer, output_volume, x_input, reconstructions)
 
+                    if idx > 0:
+                        random_volumes = None
+                        sampled_volumes = None
+                        maxed_volumes = None
+
                     save_views(views_dir, idx, image.unsqueeze(1), volumes=output_volume.unsqueeze(1), postfix='real')
                     save_views(views_dir, idx, random_views_tensor, random_volumes, postfix='random')
                     save_views(views_dir, idx, sampled_views_tensor, sampled_volumes, postfix='sampled')
                     save_views(views_dir, idx, maxed_views_tensor, maxed_volumes, postfix='maxed')
                     a = 5
 
+                    n_outputs_counter += 1
                     tqdm_obj.update(1)
 
                     if n_outputs_counter >= n_outputs_max:

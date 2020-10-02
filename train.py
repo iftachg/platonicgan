@@ -34,7 +34,6 @@ for epoch in tqdm(range(1, param.training.n_epochs + 1), desc='Training epoch'):
 
         image = image.to(param.device)
         volume = volume.to(param.device)
-
         if param.task == 'generation':
             z = utils.generate_z(param, param.training.z_size)
         else:
@@ -44,10 +43,15 @@ for epoch in tqdm(range(1, param.training.n_epochs + 1), desc='Training epoch'):
         trainer.discriminator_train(image, volume, z)
 
         trainer.logger.log_checkpoint(trainer.models, trainer.optimizers)
+
         for model in trainer.models:
             trainer.logger.log_gradients(model)
 
         trainer.logger.step()
         tqdm_obj.update(1)
+
+    print(epoch % 1 == 0)
+    if epoch % 1 == 0:
+        trainer.logger.log_checkpoint(trainer.models, trainer.optimizers, epoch=epoch)
 
 print('Training finished!...')

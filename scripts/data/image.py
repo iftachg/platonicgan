@@ -1,9 +1,6 @@
 from torch.utils.data import Dataset
 import os
-import cv2
-from scripts.utils.utils import normalize, convert_to_int
 import scripts.utils.io as dh
-import numpy as np
 
 
 class ImageDataset(Dataset):
@@ -17,6 +14,15 @@ class ImageDataset(Dataset):
         """
         self.mode = mode
         self.param = param
+
+        if hasattr(self.param.data, 'augment'):
+            self.augment = self.param.data.augment
+        else:
+            self.augment = False
+
+        if self.mode != 'train':
+            self.augment = False
+
         self.path_dir = os.path.join(os.getcwd(), param.data.path_dir, mode)
 
         self.cube_len = param.data.cube_len
@@ -29,9 +35,14 @@ class ImageDataset(Dataset):
         return self.dataset_length - 1
 
     def __getitem__(self, idx):
+        if not hasattr(self, 'augment'):
+            self.augment = False
+
+        if self.mode != 'train':
+            self.augment = False
 
         image_path = os.path.join(self.path_dir, self.file_names[idx])
-        image = dh.read_image(image_path, self.cube_len)
+        image = dh.read_image(image_path, self.cube_len, self.augment)
 
         if not image.shape[0] == 1 and (self.param.renderer.type == 'visual_hull' or self.param.renderer.type == 'absorption_only'):
             image = image[[3]]

@@ -1,3 +1,6 @@
+'''
+Generates masked CUB images
+'''
 from PIL import Image
 import numpy as np
 import os
@@ -6,7 +9,6 @@ from tqdm import tqdm
 
 
 def load_img_parts(path_dir, annotations_path, image_name):
-    # class_name, image_name = self.image_names[idx].split('/')
     image_name = image_name.rstrip()
 
     image_path = os.path.join(path_dir, image_name)
@@ -95,11 +97,6 @@ if __name__ == '__main__':
         for image_name in next(os.walk(class_path))[2]:
             if image_name[0] == '.':
                 continue
-
-            # if 'Black_footed_Albatross_0005' in image_name:
-            #     a = 5
-            # else:
-            #     continue
 
             annotations_path = os.path.join(annotations_base_path, class_name, image_name.replace('.jpg', '.mat'))
             image, bounding_box, segmentation_image = load_img_parts(class_path, annotations_path, image_name)

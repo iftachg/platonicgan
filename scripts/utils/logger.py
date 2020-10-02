@@ -97,10 +97,10 @@ class Logger():
             for name, param in model.named_parameters():
                 self.writer.add_histogram(model.__class__.__name__ + '_' + name, param.clone().cpu().data.numpy(), self.iteration)
 
-    def load_checkpoint(self):
+    def load_checkpoint(self, epoch='latest'):
 
         try:
-            checkpoint = torch.load('{}/checkpoint.pkl'.format(self.path_stats))
+            checkpoint = torch.load('{}/checkpoint_{}.pkl'.format(self.path_stats, epoch))
 
             self.iteration = checkpoint['iteration'] + 1
 
@@ -118,7 +118,7 @@ class Logger():
             print('[Info] No checkpoint file available')
             pass
 
-    def log_checkpoint(self, models, optimizers):
+    def log_checkpoint(self, models, optimizers, epoch='latest'):
 
         if self.logging_files:
 
@@ -134,7 +134,7 @@ class Logger():
                 if optimizer is not None:
                     checkpoint['optimizer_{}'.format(idx)] = optimizer.state_dict()
 
-            torch.save(checkpoint, '{}/checkpoint.pkl'.format(self.path_stats))
+            torch.save(checkpoint, '{}/checkpoint_{}.pkl'.format(self.path_stats, epoch))
 
     def log_images(self, tag, images):
         if self.logging_files:

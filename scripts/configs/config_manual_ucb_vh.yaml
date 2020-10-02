@@ -1,11 +1,14 @@
+experiment_name: simple_manual
 data:
   cube_len: 64
-  name: image # shapenet | image | ucb
-  path_dir: datasets/tree
-  use_classes: ['tree']
+  name: cub # shapenet | image | cub | cub_class
+  path_dir: datasets/CUB/
+  use_classes: ['001.Black_footed_Albatross']
   use_n_samples_2d: -1
   use_n_samples_3d: -1
-device: cpu
+  image_folder: 'CUB_manual_base'
+device: cuda
+#device: cpu
 logger:
   log_scalars_every: 100
   log_files_every: 500
@@ -27,16 +30,16 @@ models:
     n_features_min: 64
     name: default
 n_workers: 4
-name: Tree
+name: CUB_manual_base
 renderer:
   absorption_factor: 20.0
-  type: emission_absorption # absorption_only | emission_absorption | visual_hull
+  type: visual_hull # absorption_only | emission_absorption | visual_hull
 tests:
   activate: true
 training:
   adversarial_term_lambda_2d: 1.0
   adversarial_term_lambda_3d: 0.0
-  batch_size: 8
+  batch_size: 4
   d_thresh: 0.6
   data_term_lambda_2d: 8.0
   data_term_lambda_3d: 0.0
@@ -48,7 +51,7 @@ training:
   resume: False
   seed: 132
   loss: vanilla  # wgangp | vanilla
-  n_views: 1
+  n_views: 2
   view_sampling: random
   z_size: 200
 job_id: 1
