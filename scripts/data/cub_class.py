@@ -17,17 +17,7 @@ class CUBClassDataset(BaseCUBDataset):
         if not os.path.exists(os.path.join(self.class_list_path, 'train.txt')):
             self.create_splits()
 
-        if mode == "test":
-            test_image_file = open('{}/test.txt'.format(self.class_list_path), 'r')
-            file_names = list(test_image_file)
-        elif mode == "val":
-            test_image_file = open('{}/val.txt'.format(self.class_list_path), 'r')
-            file_names = list(test_image_file)
-        elif mode == "train":
-            train_image_file = open('{}/train.txt'.format(self.class_list_path), 'r')
-            file_names = list(train_image_file)
-        else:
-            raise ValueError('Unknown mode: {}'.format(mode))
+        file_names = self.load_split_files(mode)
 
         self.file_names = []
         for file_name in file_names:
