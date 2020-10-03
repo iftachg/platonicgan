@@ -13,8 +13,8 @@ class CUBClassDataset(BaseCUBDataset):
         self.used_class = self.param.data['use_classes'][0]
         self.path_dir = os.path.join('/media/john/D/projects/platonicgan', param.data.path_dir, self.param.data['image_folder'])
 
-        self.class_list_path = os.path.join('{}/lists/class_sets/{}/'.format(self.metadata_path, self.used_class))
-        if not os.path.exists(os.path.join(self.class_list_path, 'train.txt')):
+        self.list_path = os.path.join('{}/lists/class_sets/{}/'.format(self.metadata_path, self.used_class))
+        if not os.path.exists(os.path.join(self.list_path, 'train.txt')):
             self.create_splits()
 
         file_names = self.load_split_files(mode)

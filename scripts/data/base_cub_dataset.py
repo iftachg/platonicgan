@@ -15,6 +15,7 @@ class BaseCUBDataset(ImageDataset):
         print('[INFO] Setup dataset {}'.format(mode))
 
         self.metadata_path = os.path.join('/media/john/D/projects/platonicgan', param.data.path_dir)
+
         self.mode = mode
         self.cube_len = param.data.cube_len
         self.n_channel = param.data.n_channel_in
@@ -30,7 +31,7 @@ class BaseCUBDataset(ImageDataset):
     def __len__(self):
         return self.dataset_length
 
-    def load_set_files(self, mode):
+    def load_split_files(self, mode):
         if mode == "test":
             test_image_file = open('{}/test.txt'.format(self.list_path), 'r')
             file_names = list(test_image_file)
